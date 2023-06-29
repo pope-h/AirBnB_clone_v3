@@ -116,23 +116,26 @@ class TestFileStorage(unittest.TestCase):
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_get(self):
-        """Check if get return an object."""
+        """ Tests method for obtaining an instance file storage"""
         storage = FileStorage()
-        user = User(name="Test")
-        user_id = user.id
-        user.save()
-        self.assertEqual(user, storage.get(User, user_id))
+        dic = {"name": "Vecindad"}
+        instance = State(**dic)
+        storage.new(instance)
+        storage.save()
+        storage = FileStorage()
+        get_instance = storage.get(State, instance.id)
+        self.assertEqual(get_instance, instance)
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_count_with_arg(self):
-        """Check if the count with argument return the correct output."""
+    def test_count(self):
+        """ Tests count method file storage """
         storage = FileStorage()
-        users = storage.all(User)
-        self.assertEqual(len(users), storage.count(User))
-
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_count_without_arg(self):
-        """Check if the count without argument return the correct output."""
-        storage = FileStorage()
-        objs = storage.all()
-        self.assertEqual(len(objs), storage.count())
+        dic = {"name": "Vecindad"}
+        state = State(**dic)
+        storage.new(state)
+        dic = {"name": "Mexico"}
+        city = City(**dic)
+        storage.new(city)
+        storage.save()
+        c = storage.count()
+        self.assertEqual(len(storage.all()), c)

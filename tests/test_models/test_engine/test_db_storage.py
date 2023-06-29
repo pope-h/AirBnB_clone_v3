@@ -18,6 +18,7 @@ import json
 import os
 import pep8
 import unittest
+from models import storage
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -87,25 +88,23 @@ class TestFileStorage(unittest.TestCase):
     def test_save(self):
         """Test that save properly saves objects to file.json"""
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_get(self):
-        """Check if get return an object."""
-        storage = DBStorage()
-        user = User(name="Test")
-        user_id = user.id
-        user.save()
-        self.assertEqual(user, storage.get(User, user_id))
+    def test_get_db(self):
+        """ Tests method for obtaining an instance db storage"""
+        dic = {"name": "Cundinamarca"}
+        instance = State(**dic)
+        storage.new(instance)
+        storage.save()
+        get_instance = storage.get(State, instance.id)
+        self.assertEqual(get_instance, instance)
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_count_with_arg(self):
-        """Check if the count with argument return the correct output."""
-        storage = DBStorage()
-        users = storage.all(User)
-        self.assertEqual(len(users), storage.count(User))
-
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_count_without_arg(self):
-        """Check if the count without argument return the correct output."""
-        storage = DBStorage()
-        objs = storage.all()
-        self.assertEqual(len(objs), storage.count())
+    def test_count(self):
+        """ Tests count method db storage """
+        dic = {"name": "Vecindad"}
+        state = State(**dic)
+        storage.new(state)
+        dic = {"name": "Mexico", "state_id": state.id}
+        city = City(**dic)
+        storage.new(city)
+        storage.save()
+        c = storage.count()
+        self.assertEqual(len(storage.all()), c)
